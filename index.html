@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MCQ Test</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .question { margin-bottom: 15px; }
+    .option { margin-bottom: 10px; }
+    .result, .score, .timer { font-weight: bold; margin-top: 15px; }
+    button { margin: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2 id="quiz-title">MCQ Test</h2>
+
+  <div class="timer">Time: <span id="time">0</span> sec</div>
+  <div class="score">Score: <span id="score">0</span></div>
+
+  <div class="question" id="question"></div>
+
+  <div class="option"><input type="radio" name="answer" value="0"> <span id="opt0"></span></div>
+  <div class="option"><input type="radio" name="answer" value="1"> <span id="opt1"></span></div>
+  <div class="option"><input type="radio" name="answer" value="2"> <span id="opt2"></span></div>
+
+  <button onclick="checkAnswer()">Check Answer</button>
+  <button onclick="nextQuestion()">Next Question</button>
+  <button onclick="translate()">Translate</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const questions = [
+      {
+        question_en: "What is the capital of France?",
+        options_en: ["London", "Paris", "Rome"],
+        correct: 1,
+        question_ar: "ما هي عاصمة فرنسا؟",
+        options_ar: ["لندن", "باريس", "روما"]
+      },
+      {
+        question_en: "Which planet is known as the Red Planet?",
+        options_en: ["Mars", "Venus", "Jupiter"],
+        correct: 0,
+        question_ar: "أي كوكب يُعرف بالكوكب الأحمر؟",
+        options_ar: ["المريخ", "الزهرة", "المشتري"]
+      },
+      {
+        question_en: "What is 2 + 2?",
+        options_en: ["3", "4", "5"],
+        correct: 1,
+        question_ar: "كم حاصل جمع 2 + 2؟",
+        options_ar: ["٣", "٤", "٥"]
+      }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let isTranslated = false;
+    let timer = 0;
+    let timerInterval = setInterval(() => {
+      timer++;
+      document.getElementById("time").innerText = timer;
+    }, 1000);
+
+    function loadQuestion() {
+      const q = questions[currentIndex];
+      document.getElementById("result").innerText = "";
+      isTranslated = false;
+
+      document.getElementById("question").innerText = q.question_en;
+      document.getElementById("opt0").innerText = q.options_en[0];
+      document.getElementById("opt1").innerText = q.options_en[1];
+      document.getElementById("opt2").innerText = q.options_en[2];
+
+      const options = document.getElementsByName("answer");
+      for (let i = 0; i < options.length; i++) {
+        options[i].checked = false;
+      }
+    }
+
+    function checkAnswer() {
+      const options = document.getElementsByName("answer");
+      let selected = null;
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].checked) {
+          selected = parseInt(options[i].value);
+          break;
+        }
+      }
+
+      if (selected === null) {
+        document.getElementById("result").innerText = isTranslated ? "اختر إجابة أولاً." : "Please select an answer.";
+        return;
+      }
+
+      if (selected === questions[currentIndex].correct) {
+        score++;
+        document.getElementById("result").innerText = isTranslated ? "إجابة صحيحة!" : "Correct!";
+        document.getElementById("score").innerText = score;
+      } else {
+        document.getElementById("result").innerText = isTranslated ? "إجابة خاطئة." : "Wrong answer.";
+      }
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= questions.length) {
+        clearInterval(timerInterval);
+        document.getElementById("question").innerText = isTranslated ? "انتهى الاختبار!" : "Test finished!";
+        document.getElementById("opt0").innerText = "";
+        document.getElementById("opt1").innerText = "";
+        document.getElementById("opt2").innerText = "";
+        document.getElementById("result").innerText =
+          (isTranslated ? "درجتك: " : "Your score: ") + score + "/" + questions.length;
+        return;
+      }
+      loadQuestion();
+    }
+
+    function translate() {
+      const q = questions[currentIndex];
+      document.getElementById("quiz-title").innerText = "اختبار اختيارات";
+      document.getElementById("question").innerText = q.question_ar;
+      document.getElementById("opt0").innerText = q.options_ar[0];
+      document.getElementById("opt1").innerText = q.options_ar[1];
+      document.getElementById("opt2").innerText = q.options_ar[2];
+      isTranslated = true;
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html>
